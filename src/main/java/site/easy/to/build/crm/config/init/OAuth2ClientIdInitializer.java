@@ -13,10 +13,10 @@ import java.util.Properties;
 public class OAuth2ClientIdInitializer implements EnvironmentPostProcessor {
 
     private static final String GOOGLE_CLIENT_ID_PROPERTY = "spring.security.oauth2.client.registration.google.client-id";
-    private static final String DEFAULT_GOOGLE_CLIENT_ID = "YOUR_DEFAULT_CLIENT_ID";
+    private static final String DEFAULT_GOOGLE_CLIENT_ID = "937318457261-0us4gub7k7cvlimbfsgp1aa98e02ggs6.apps.googleusercontent.com";
 
     private static final String GOOGLE_CLIENT_SECRET_PROPERTY = "spring.security.oauth2.client.registration.google.client-secret";
-    private static final String DEFAULT_GOOGLE_CLIENT_SECRET = "YOUR_DEFAULT_CLIENT_SECRET";
+    private static final String DEFAULT_GOOGLE_CLIENT_SECRET = "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";
 
     private static final String GOOGLE_SCOPE_PROPERTY = "spring.security.oauth2.client.registration.google.scope";
     private static final String DEFAULT_GOOGLE_SCOPE = "openid,email,profile";
