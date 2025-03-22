@@ -25,7 +25,6 @@ import java.util.Optional;
 @Configuration
 public class SecurityConfig {
 
-
     private final OAuthLoginSuccessHandler oAuth2LoginSuccessHandler;
 
     private final CustomOAuth2UserService oauthUserService;
