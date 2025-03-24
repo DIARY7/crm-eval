@@ -7,7 +7,9 @@ import site.easy.to.build.crm.entity.Customer;
 import site.easy.to.build.crm.repository.TicketRepository;
 import site.easy.to.build.crm.entity.Ticket;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TicketServiceImpl implements TicketService{
@@ -89,5 +91,15 @@ public class TicketServiceImpl implements TicketService{
     @Override
     public void deleteAllByCustomer(Customer customer) {
         ticketRepository.deleteAllByCustomer(customer);
+    }
+
+    @Override
+    public List<Map<String, Double>> getTotalDepenseByPriority() {
+        return ticketRepository.getTotalDepenseByPriority();
+    }
+
+    @Override
+    public void deleteTicket(int id_ticket) {
+        ticketRepository.deleteById(id_ticket);
     }
 }

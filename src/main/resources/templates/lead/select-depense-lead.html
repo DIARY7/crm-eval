@@ -2,16 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <div th:insert="~{/general/head.html}"></div>
-<meta name="_csrf" content="${_csrf.token}"/>
-<meta name="_csrf_header" content="${_csrf.headerName}"/>
 
 <!-- Editable CSS -->
-<link rel="stylesheet" type="text/css"
-      th:href="@{/css/dataTables.bootstrap4.css}">
-<link rel="stylesheet" type="text/css"
-      th:href="@{/css/responsive.dataTables.min.css}">
 
 <!-- Custom CSS -->
+<link th:href="@{/css/bootstrap-wysihtml5.css}" rel="stylesheet">
 <link th:href="@{/css/style.min.css}" rel="stylesheet">
 <!-- page css -->
 <link th:href="@{/css/pages/inbox.css}" rel="stylesheet">
@@ -74,47 +69,38 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Leads</h4>
-                            <div class="table-responsive m-t-40">
-                                <table id="config-table" class="table display table-bordered table-striped no-wrap">
-                                    <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Lead</th>
-                                        <th>phone</th>
-                                        <th>Status</th>
-                                        <th>Customer</th>
-                                        <th>Depense</th>
-                                        <th>Assigned Employee</th>
-                                        <th>Assign depense</th>
-                                        <th>Show</th>
-                                        <th>Edit</th>
-                                        <th>Delete</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:if="${leads != null}" th:each="lead : ${leads}">
-                                        <td th:text="${lead.leadId}"></td>
-                                        <td th:text="${lead.name}"></td>
-                                        <td th:text="${lead.phone}"></td>
-                                        <td th:text="${lead.status}"></td>
-                                        <td th:text="${lead.customer.name}"></td>
-                                        <td th:text="${lead.depense != null ? lead.depense.montant : 'Aucune'}"></td>
-                                        <td th:text="${lead.employee.username}"></td>
-                                        <td><a th:href="${home + 'employee/lead/add_depense/' + lead.leadId}"><i class="fas fa-money-bill-wave"></i></a></td>
-                                        <td><a th:href="${home + 'employee/lead/show/' + lead.leadId}"><i class="fas fa-eye"></i></a></td>
-                                        <td><a th:href="${home + 'employee/lead/update/' + lead.leadId}"><i class="fas fa-edit"></i></a></td>
-                                        <td>
-                                            <form th:action="${home + 'employee/lead/delete/' + lead.leadId}" method="post">
-                                                <button type="submit" class="btn btn-primary">
-                                                    <i class="mdi mdi-delete"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                            <h4 class="card-title">Poser la dépense</h4>
+                            
+                            <div id="alertMessage" class="alert alert-warning" style="display:none;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Attention!</strong> Les depenses depasse le taux du budget .
                             </div>
+                            <!-- Formulaire pour sélectionner la dépense -->
+                            <form th:action="@{/employee/ticket/create-ticket}" method="post">
+                                <!-- Champs cachés pour conserver les données du ticket -->
+                                
+                                <label class="m-t-20" for="montant">Montant:</label>
+                                <div class="input-group">
+                                    <input type="text" name="montant" id="montant" class="form-control" th:value="${montant != null ? montant : ''}"  >
+                                </div>
+
+                                <label class="m-t-20" for="budgetId">Budget : </label>
+                                <div class="input-group">
+                                    <select name="budgetId" id="budgetId" class="form-control" required>
+                                        <option value=""> Selectionner un budget </option>
+                                        <option th:each="budget : ${budgets}" th:text="${'N°' + budget.id}" th:value="${budget.id}" th:selected="${budgetSelect != null and budget.id == budgetSelect}"></option>
+                                    </select>
+                                </div>
+
+                                <!-- Spinner de chargement (initialement caché) -->
+                                <div id="loadingSpinner" style="display:none; text-align:center;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" id="submitButton" disabled class="btn btn-primary m-t-20">Créer le ticket</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -152,6 +138,75 @@
 <!-- ============================================================== -->
 <!-- All Jquery -->
 <!-- ============================================================== -->
+
+
+<!-- Alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function checkTaux() {
+        var idBudget = document.getElementById('budgetId').value;
+        var montantPlus = document.getElementById('montant').value;
+
+        if (!idBudget) {
+            document.getElementById('submitButton').disabled = true;
+            return;
+        }
+
+        document.getElementById('loadingSpinner').style.display = 'block';
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById('alertMessage').style.display = 'none';
+
+        if (idBudget && montantPlus) {
+            fetch(`/depense/rest/check_taux?id_budget=${idBudget}&montantPlus=${montantPlus}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById('submitButton').disabled = false;
+                    if (Number(data.alert) == 2) {
+                        document.getElementById('alertMessage').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                })
+                .finally(() => {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                });
+        } else {
+            console.log("Veuillez remplir les champs nécessaires.");
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('submitButton').disabled = false;
+        }
+    }
+
+// Ajouter l'événement sur les deux champs
+document.getElementById('budgetId').addEventListener('change', checkTaux);
+document.getElementById('montant').addEventListener('change', checkTaux);
+
+
+</script>
+<script th:inline="javascript">
+    var alertType = /*[[${alert}]]*/ null;
+    
+
+    if (alertType == 1) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Dépassement de budget !',
+            text: 'Voulez-vous continuer malgré le dépassement ?',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Oui, soumettre',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/employee/ticket/confirm-ticket"; 
+            }
+        });
+    }
+</script>
+
 <script th:inline="javascript">
     var home = /*[[${home}]]*/ null;
 </script>
@@ -160,23 +215,26 @@
 <script th:src="@{/js/library/popper.min.js}" type="text/javascript"></script>
 <script th:src="@{/js/library/bootstrap.min.js}" type="text/javascript"></script>
 <!--    &lt;!&ndash; slimscrollbar scrollbar JavaScript &ndash;&gt;-->
-<script th:src="@{/js/library/perfect-scrollbar.jquery.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/perfect-scrollbar.jquery.min.js}" type="text/javascript">></script>
 <!--Wave Effects -->
-<script th:src="@{/js/library/waves.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/waves.js}" type="text/javascript">></script>
 <!--Menu sidebar -->
-<script th:src="@{/js/library/sidebarmenu.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/sidebarmenu.js}" type="text/javascript">></script>
 <!--stickey kit -->
 <script th:src="@{/js/library/sticky-kit.min.js}"></script>
-<script th:src="@{/js/library/jquery.sparkline.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/jquery.sparkline.min.js}" type="text/javascript">></script>
 <!--Custom JavaScript -->
-<script th:src="@{/js/library/custom.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/custom.min.js}" type="text/javascript">></script>
 <!-- Editable -->
-<script th:src="@{/js/library/jquery.dataTables.min.js}"></script>
-<script th:src="@{/js/library/dataTables.responsive.min.js}"></script>
+
+<script th:src="@{/js/library/wysihtml5-0.3.0.js}"></script>
+<script th:src="@{/js/library/bootstrap-wysihtml5.js}"></script>
+
 <script>
-    $('#config-table').DataTable({
-        responsive: true
+    $(document).ready(function() {
+        $('.textarea_editor').wysihtml5();
     });
 </script>
+
 </body>
 </html>
