@@ -48,6 +48,10 @@ public class Ticket {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_depense",referencedColumnName = "id")
+    private Depense depense;
+
     public Ticket() {
     }
 
@@ -132,5 +136,12 @@ public class Ticket {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public Depense getDepense() {
+        return depense;
+    }
+
+    public void setDepense(Depense depense) {
+        this.depense = depense;
     }
 }

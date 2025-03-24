@@ -74,43 +74,36 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Leads</h4>
+                            <h4 class="card-title">Budgets</h4>
                             <div class="table-responsive m-t-40">
                                 <table id="config-table" class="table display table-bordered table-striped no-wrap">
                                     <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Lead</th>
-                                        <th>phone</th>
-                                        <th>Status</th>
+                                        <th>Montant</th>
+                                        <th>Desciption</th>
                                         <th>Customer</th>
-                                        <th>Depense</th>
-                                        <th>Assigned Employee</th>
-                                        <th>Assign depense</th>
-                                        <th>Show</th>
+                                        <th>Date Creation</th>
                                         <th>Edit</th>
                                         <th>Delete</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:if="${leads != null}" th:each="lead : ${leads}">
-                                        <td th:text="${lead.leadId}"></td>
-                                        <td th:text="${lead.name}"></td>
-                                        <td th:text="${lead.phone}"></td>
-                                        <td th:text="${lead.status}"></td>
-                                        <td th:text="${lead.customer.name}"></td>
-                                        <td th:text="${lead.depense != null ? lead.depense.montant : 'Aucune'}"></td>
-                                        <td th:text="${lead.employee.username}"></td>
-                                        <td><a th:href="${home + 'employee/lead/add_depense/' + lead.leadId}"><i class="fas fa-money-bill-wave"></i></a></td>
-                                        <td><a th:href="${home + 'employee/lead/show/' + lead.leadId}"><i class="fas fa-eye"></i></a></td>
-                                        <td><a th:href="${home + 'employee/lead/update/' + lead.leadId}"><i class="fas fa-edit"></i></a></td>
-                                        <td>
-                                            <form th:action="${home + 'employee/lead/delete/' + lead.leadId}" method="post">
+                                    <tr th:if="${budgets != null}" th:each="budget : ${budgets}">
+                                        <td th:text="${budget.id}"></td>
+                                        <td th:text="${budget.montant}"></td>
+                                        <td th:text="${budget.description}"></td>
+                                        <td th:text="${budget.customer.name}"></td>
+                                        <td th:text="${budget.dateCreation}"></td>
+                                        <!-- <td><a th:href="${home + 'employee/ticket/show-ticket/' + ticket.ticketId}"><i class="fas fa-eye"></i></a></td>
+                                        <td><a th:href="${home + 'employee/ticket/update-ticket/' + ticket.ticketId}"><i class="fas fa-edit"></i></a></td> -->
+                                        <!-- <td>
+                                            <form th:action="${home + 'employee/ticket/delete-ticket/' + ticket.ticketId}" method="post">
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="mdi mdi-delete"></i>
                                                 </button>
                                             </form>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                     </tbody>
                                 </table>
@@ -155,21 +148,21 @@
 <script th:inline="javascript">
     var home = /*[[${home}]]*/ null;
 </script>
-<script th:src="@{/js/library/jquery-3.2.1.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/jquery-3.2.1.min.js}" type="text/javascript">></script>
 <!--    &lt;!&ndash; Bootstrap tether Core JavaScript &ndash;&gt;-->
-<script th:src="@{/js/library/popper.min.js}" type="text/javascript"></script>
-<script th:src="@{/js/library/bootstrap.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/popper.min.js}" type="text/javascript">></script>
+<script th:src="@{/js/library/bootstrap.min.js}" type="text/javascript">></script>
 <!--    &lt;!&ndash; slimscrollbar scrollbar JavaScript &ndash;&gt;-->
-<script th:src="@{/js/library/perfect-scrollbar.jquery.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/perfect-scrollbar.jquery.min.js}" type="text/javascript">></script>
 <!--Wave Effects -->
-<script th:src="@{/js/library/waves.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/waves.js}" type="text/javascript">></script>
 <!--Menu sidebar -->
-<script th:src="@{/js/library/sidebarmenu.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/sidebarmenu.js}" type="text/javascript">></script>
 <!--stickey kit -->
 <script th:src="@{/js/library/sticky-kit.min.js}"></script>
-<script th:src="@{/js/library/jquery.sparkline.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/jquery.sparkline.min.js}" type="text/javascript">></script>
 <!--Custom JavaScript -->
-<script th:src="@{/js/library/custom.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/library/custom.min.js}" type="text/javascript">></script>
 <!-- Editable -->
 <script th:src="@{/js/library/jquery.dataTables.min.js}"></script>
 <script th:src="@{/js/library/dataTables.responsive.min.js}"></script>

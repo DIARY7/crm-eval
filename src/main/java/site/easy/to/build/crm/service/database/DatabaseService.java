@@ -1,11 +1,24 @@
 package site.easy.to.build.crm.service.database;
 
 import jakarta.transaction.Transactional;
+import site.easy.csvModel.CustomerCsv;
+import site.easy.to.build.crm.entity.Customer;
+import site.easy.to.build.crm.entity.CustomerLoginInfo;
+import site.easy.to.build.crm.repository.CustomerRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -13,6 +26,9 @@ public class DatabaseService {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    CustomerRepository customerRepository;
 
     @Transactional
     public void resetDatabase(){
@@ -28,6 +44,8 @@ public class DatabaseService {
                 "lead_settings",
                 "ticket_settings",
                 "trigger_lead",
+                "depense",
+                "budget",
                 "trigger_ticket",
                 "trigger_contract"
         ); 
@@ -69,7 +87,10 @@ public class DatabaseService {
             }
 
         } catch (Exception e) {
+<<<<<<< HEAD
             e.printStackTrace();
+=======
+>>>>>>> 526086c40acecb3f66d0da33d989845967ccd828
             throw new RuntimeException("Erreur lors de l'importation du fichier CSV : " + e.getMessage());
         }
     }

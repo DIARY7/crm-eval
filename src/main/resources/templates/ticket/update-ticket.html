@@ -137,6 +137,13 @@
                                     </select>
                                 </div>
 
+                                <label class="m-t-20" for="customerId">Customer:</label>
+                                <div class="input-group">
+                                    <select name="customerId" id="customerId" class="form-control">
+                                        <option th:each="customer : ${customers}" th:text="${customer.name}" th:value="${customer.customerId}" th:selected="${ticket.customer.customerId eq customer.customerId}"></option>
+                                    </select>
+                                </div>
+
                                 <button type="submit" class="btn btn-primary m-t-20">Update ticket</button>
                             </form>
                         </div>

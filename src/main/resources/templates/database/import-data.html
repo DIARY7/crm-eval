@@ -90,9 +90,9 @@
                             <form th:action="${home + 'database/importer'}" method="post" enctype="multipart/form-data">
                                 <div class="form-group">
                                     <label for="csvFile1"> Contract CSV file:</label>
-                                    <input type="file" id="csvFile1" name="file" class="form-control" accept=".csv" required>
+                                    <input type="file" id="csvFile1" name="file" class="form-control"  accept=".csv" required>
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label for="csvFile2">Lead CSV file:</label>
                                     <input type="file" id="csvFile2" name="file" class="form-control" accept=".csv" required>
                                 </div>
@@ -103,7 +103,7 @@
                                 <div class="form-group">
                                     <label for="csvFile4">Another CSV file:</label>
                                     <input type="file" id="csvFile4" name="file" class="form-control" accept=".csv" required>
-                                </div>
+                                </div> -->
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-upload"></i> Upload CSV
                                 </button>

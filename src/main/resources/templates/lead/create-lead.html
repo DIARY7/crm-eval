@@ -71,7 +71,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Create New Lead</h4>
-                            <form th:object="${lead}" th:action="@{/employee/lead/create}" enctype="multipart/form-data" id="email-form" method="post">
+                            <form th:object="${lead}" th:action="@{/employee/lead/create}" enctype="multipart/form-data" id="form-lead" method="post">
                                 <input type="hidden" id="allFiles" name="allFiles">
                                 <label class="m-t-20" for="name">Name:</label>
                                 <div class="input-group">
@@ -112,10 +112,28 @@
 
                                 <label class="m-t-20" for="customerId">Customer:</label>
                                 <div class="input-group">
-                                    <select name="customerId" id="customerId" class="form-control">
+                                    <select name="customerId" id="customerId" class="form-control" onchange="loadBudgets(this.value)" >
                                         <option th:each="customer : ${customers}" th:text="${customer.name}" th:value="${customer.customerId}"></option>
                                     </select>
                                 </div>
+
+                                <label class="m-t-20" for="budgetId">Budget:</label>
+                                <div class="input-group">
+                                    <select name="budgetId" id="budgetId" class="form-control">
+                                        <option value="">Select a budget</option>
+                                    </select>
+                                </div>
+
+                                <label class="m-t-20" for="montant">Montant Depense :</label>
+                                <div class="input-group">
+                                    <input type="text" name="montant" id="montant" class="form-control" th:value="${montant != null ? montant : ''}"  >
+                                </div>
+
+                                <div id="alertMessage" class="alert alert-warning" style="display:none;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>Attention!</strong> Les depenses depense le taux du budget .
+                                </div>
+
                                 <label class="m-t-20"><i class="ti-link"></i> Attachment</label>
                                 <div class="form-group">
                                     <div class="dropzone" id="my-dropzone"></div>
@@ -124,7 +142,15 @@
                                     <input type="checkbox" class="custom-control-input trigger-emails" th:id="googleDrive" th:field="*{googleDrive}">
                                     <label th:for="googleDrive" class="custom-control-label">Upload Docs to your Google Drive</label>
                                 </div>
-                                <button type="submit" class="btn btn-primary m-t-20">Create Lead</button>
+
+                                <!-- Spinner de chargement (initialement caché) -->
+                                <div id="loadingSpinner" style="display:none; text-align:center;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary m-t-20" id="submitButton" >Create Lead</button>
                             </form>
                         </div>
                     </div>
@@ -192,6 +218,10 @@
 <!-- ============================================================== -->
 <!-- All Jquery -->
 <!-- ============================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:src="@{/js/taux-lead.js}" ></script>
+
 <script th:inline="javascript">
     var home = /*[[${home}]]*/ null;
 </script>

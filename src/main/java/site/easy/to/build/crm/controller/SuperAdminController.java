@@ -1,6 +1,7 @@
 package site.easy.to.build.crm.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,8 @@ import java.util.List;
 public class SuperAdminController {
     @Autowired
     DatabaseService dataService;
+
+
     @GetMapping("reset")
     public String resetBase(){
         try{
@@ -32,8 +35,18 @@ public class SuperAdminController {
     }
 
     @GetMapping("import")
+<<<<<<< HEAD
     public String toFormImport(){
         return "database/import-data";
+=======
+    public String toImportBase(@RequestParam("file") MultipartFile file){
+        try {
+            dataService.importerCsv(file);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return "redirect:/";
+>>>>>>> 526086c40acecb3f66d0da33d989845967ccd828
     }
 
     @PostMapping("importer")

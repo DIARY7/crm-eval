@@ -9,6 +9,7 @@ import jakarta.validation.groups.Default;
 import site.easy.to.build.crm.customValidations.customer.UniqueEmail;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "customer")
@@ -64,6 +65,7 @@ public class Customer {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable=false)
     @JsonIgnoreProperties("customer")
+    @JsonIgnore
     private User user;
 
     @OneToOne
@@ -73,6 +75,11 @@ public class Customer {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
+    List<Budget> budgets; 
+
 
     public Customer() {
     }
@@ -97,6 +104,15 @@ public class Customer {
         this.createdAt = createdAt;
     }
 
+    /* Fonction complementaire */
+    public double getTotalBudget(){
+        double somme=0;
+        for (int i = 0; i < this.budgets.size() ; i++) {
+            somme+=this.budgets.get(i).getMontant();
+        }
+        return somme;
+    }
+    /* getters and setters */
     public Integer getCustomerId() {
         return customerId;
     }
@@ -223,6 +239,13 @@ public class Customer {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public List<Budget> getBudgets() {
+        return budgets;
+    }
+
+    public void setBudgets(List<Budget> budgets) {
+        this.budgets = budgets;
     }
 
 //    public List<Ticket> getTickets() {

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -25,7 +27,9 @@ import site.easy.to.build.crm.google.service.acess.GoogleAccessService;
 import site.easy.to.build.crm.google.service.calendar.GoogleCalendarApiService;
 import site.easy.to.build.crm.google.service.drive.GoogleDriveApiService;
 import site.easy.to.build.crm.google.service.gmail.GoogleGmailApiService;
+import site.easy.to.build.crm.service.budget.BudgetService;
 import site.easy.to.build.crm.service.customer.CustomerService;
+import site.easy.to.build.crm.service.depense.DepenseService;
 import site.easy.to.build.crm.service.drive.GoogleDriveFileService;
 import site.easy.to.build.crm.service.file.FileService;
 import site.easy.to.build.crm.service.lead.LeadActionService;
@@ -38,6 +42,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -60,6 +65,12 @@ public class LeadController {
     private final LeadEmailSettingsService leadEmailSettingsService;
     private final GoogleGmailApiService googleGmailApiService;
     private final EntityManager entityManager;
+
+    @Autowired
+    BudgetService budgetService;
+
+    @Autowired
+    DepenseService depenseService;
 
     @Autowired
     public LeadController(LeadService leadService, AuthenticationUtils authenticationUtils, UserService userService, CustomerService customerService,
@@ -164,11 +175,36 @@ public class LeadController {
         return "lead/create-lead";
     }
 
+    @GetMapping("/add_depense/{id}")
+    public String showUpdatingDepense(Model model, @PathVariable("id") int idLead, Authentication authentication) {
+
+        int userId = authenticationUtils.getLoggedInUserId(authentication);
+        User loggedInUser = userService.findById(userId);
+        if(loggedInUser.isInactiveUser()) {
+            return "error/account-inactive";
+        }
+        Lead lead = leadService.findByLeadId(idLead);
+        List<Depense> depenses = depenseService.findAllDepenseCustomer(lead.getCustomer().getCustomerId());
+        
+        model.addAttribute("lead",lead);
+        model.addAttribute("depenses", depenses);
+        return "lead/select-depense-lead";
+    }
+
+    @PostMapping("/add_depense")
+    public String setDepenseInLead(Model model , @RequestParam("idLead") int  idLead  , @RequestParam("depenseId") int idDepense ){
+        Depense depense = depenseService.findById(idDepense);
+        Lead lead = leadService.findByLeadId(idLead);
+        lead.setDepense(depense);
+        leadService.save(lead);
+        return "redirect:/employee/lead/assigned-leads";
+    }
+
     @PostMapping("/create")
     public String createLead(@ModelAttribute("lead") @Validated Lead lead, BindingResult bindingResult,
                              @RequestParam("customerId") int customerId, @RequestParam("employeeId") int employeeId,
-                             Authentication authentication, @RequestParam("allFiles")@Nullable String files,
-                             @RequestParam("folderId") @Nullable String folderId, Model model) throws JsonProcessingException {
+                             Authentication authentication, @RequestParam("allFiles")@Nullable String files, 
+                             @RequestParam("folderId") @Nullable String folderId,@RequestParam("montant") double montant , @RequestParam("budgetId") int budgetId , Model model) throws JsonProcessingException,Exception {
 
         int userId = authenticationUtils.getLoggedInUserId(authentication);
         User manager = userService.findById(userId);
@@ -187,10 +223,19 @@ public class LeadController {
         if(AuthorizationUtil.hasRole(authentication, "ROLE_EMPLOYEE") && (employee.getId() != userId)) {
             return "error/500";
         }
+        
+        Budget budget = budgetService.findById(budgetId);
+        
+        Depense depense = new Depense();
+        depense.setMontant(montant);
+        depense.setBudget(budget);
+        depense.setDateUpdate(LocalDate.now());
+
         lead.setCustomer(customer);
         lead.setEmployee(employee);
         lead.setManager(manager);
         lead.setGoogleDriveFolderId(folderId);
+        lead.setDepense(depense);
         lead.setCreatedAt(LocalDateTime.now());
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -215,6 +260,8 @@ public class LeadController {
             fileUtil.saveGoogleDriveFiles(authentication, allFiles, folderId, createdLead);
         }
 
+
+
         if (lead.getStatus().equals("meeting-to-schedule")) {
             return "redirect:/employee/calendar/create-event?leadId=" + lead.getLeadId();
         }
@@ -223,6 +270,8 @@ public class LeadController {
         }
         return "redirect:/employee/lead/assigned-leads";
     }
+
+
 
     @GetMapping("/update/{id}")
     public String showUpdatingForm(Model model, @PathVariable("id") int id, Authentication authentication) {
