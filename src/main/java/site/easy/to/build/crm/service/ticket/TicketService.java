@@ -3,7 +3,9 @@ package site.easy.to.build.crm.service.ticket;
 import site.easy.to.build.crm.entity.Customer;
 import site.easy.to.build.crm.entity.Ticket;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface TicketService {
     public Ticket findByTicketId(int id);
@@ -33,4 +35,8 @@ public interface TicketService {
     long countByCustomerCustomerId(int customerId);
 
     void deleteAllByCustomer(Customer customer);
+
+    List<Map<String, Double>> getTotalDepenseByPriority(); 
+
+    void deleteTicket(int id_ticket);
 }

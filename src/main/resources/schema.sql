@@ -229,6 +229,32 @@ CREATE TABLE IF NOT EXISTS `customer` (
   ) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
   /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+
+--
+-- Les tables ajoutés 
+--
+
+CREATE TABLE IF NOT EXISTS budget(
+   id INT AUTO_INCREMENT,
+   montant DECIMAL(18,3)  NOT NULL,
+   description VARCHAR(75) ,
+   customer_id int unsigned NOT NULL,
+   date_creation DATE DEFAULT (CURRENT_DATE),
+   PRIMARY KEY(id),
+   FOREIGN KEY(customer_id) REFERENCES customer(customer_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS depense(
+   id INT AUTO_INCREMENT,
+   montant DECIMAL(18,3) NOT NULL,
+   description VARCHAR(75),
+   date_update DATE,
+   id_budget INT,
+   PRIMARY KEY(id),
+   FOREIGN KEY(id_budget) REFERENCES budget(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 --
 -- Table structure for table `trigger_lead`
 --
@@ -247,6 +273,7 @@ CREATE TABLE IF NOT EXISTS `trigger_lead` (
   `meeting_id` varchar(255) DEFAULT NULL,
   `google_drive` tinyint(1) DEFAULT NULL,
   `google_drive_folder_id` varchar(255) DEFAULT NULL,
+  `id_depense` INT, 
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`lead_id`),
   UNIQUE KEY `meeting_info` (`meeting_id`),
@@ -255,7 +282,8 @@ CREATE TABLE IF NOT EXISTS `trigger_lead` (
   KEY `employee_id` (`employee_id`),
   CONSTRAINT `trigger_lead_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
   CONSTRAINT `trigger_lead_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `trigger_lead_ibfk_3` FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `trigger_lead_ibfk_3` FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `trigger_lead_ibfk_4` FOREIGN KEY (`id_depense`) REFERENCES `depense` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -275,6 +303,7 @@ CREATE TABLE IF NOT EXISTS `trigger_ticket` (
   `customer_id` int unsigned NOT NULL,
   `manager_id` int DEFAULT NULL,
   `employee_id` int DEFAULT NULL,
+  `id_depense` INT,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`ticket_id`),
   KEY `fk_ticket_customer` (`customer_id`),
@@ -282,7 +311,8 @@ CREATE TABLE IF NOT EXISTS `trigger_ticket` (
   KEY `fk_ticket_employee` (`employee_id`),
   CONSTRAINT `fk_ticket_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
   CONSTRAINT `fk_ticket_employee` FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_ticket_manager` FOREIGN KEY (`manager_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `fk_ticket_manager` FOREIGN KEY (`manager_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_ticket_ibfk_4` FOREIGN KEY (`id_depense`) REFERENCES `depense` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -505,3 +535,14 @@ CREATE TABLE IF NOT EXISTS `google_drive_file` (
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+CREATE TABLE IF NOT EXISTS parametrage (
+  id INTEGER AUTO_INCREMENT PRIMARY KEY,
+  taux_alert DECIMAL(8,3) NOT NULL DEFAULT 0  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Insérer une seule fois, mais ne faire aucune modification si la ligne existe déjà.
+INSERT INTO parametrage(id,taux_alert)
+VALUES(1,0.7)
+ON DUPLICATE KEY UPDATE id = id;
+
