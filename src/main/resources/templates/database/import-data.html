@@ -89,21 +89,17 @@
                             <!-- Formulaire d'importation CSV -->
                             <form th:action="${home + 'database/importer'}" method="post" enctype="multipart/form-data">
                                 <div class="form-group">
-                                    <label for="csvFile1"> Contract CSV file:</label>
-                                    <input type="file" id="csvFile1" name="file" class="form-control"  accept=".csv" required>
-                                </div>
-                                <!-- <div class="form-group">
-                                    <label for="csvFile2">Lead CSV file:</label>
-                                    <input type="file" id="csvFile2" name="file" class="form-control" accept=".csv" required>
+                                    <label for="csvFile1"> CustomerCSV file:</label>
+                                    <input type="file" id="csvFile1" name="fileCustomer" class="form-control"  accept=".csv" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="csvFile3">Tiket CSV file:</label>
-                                    <input type="file" id="csvFile3" name="file" class="form-control" accept=".csv" required>
+                                    <label for="csvFile2">Lead / Ticket CSV file:</label>
+                                    <input type="file" id="csvFile2" name="fileLeadTicket" class="form-control" accept=".csv" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="csvFile4">Another CSV file:</label>
-                                    <input type="file" id="csvFile4" name="file" class="form-control" accept=".csv" required>
-                                </div> -->
+                                    <label for="csvFile3">Budget CSV file:</label>
+                                    <input type="file" id="csvFile3" name="fileBudget" class="form-control" accept=".csv" required>
+                                </div>
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-upload"></i> Upload CSV
                                 </button>
@@ -144,6 +140,38 @@
 <!-- End Wrapper -->
 <!-- ============================================================== -->
 <!-- ============================================================== -->
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:inline="javascript">
+    /* Affichage de l'alerte en cas d'erreur */
+    var numLigne = /*[[${numLigne}]]*/ null;
+    var nomFichier = /*[[${nomFichier}]]*/ null;
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    
+    if (numLigne !== null && nomFichier !== null) {
+        let ligne = numLigne === 0 ? "inconnu" : numLigne;
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur lors de l\'importation',
+            text: 'Erreur dans le fichier ' + nomFichier + ' à la ligne ' + ligne + ' : ' + errorMessage,
+            confirmButtonText: 'OK'
+        });
+    }
+
+    /* Affichage de l'alerte en cas de succès */
+    var success = /*[[${success}]]*/ null;
+    if (success !== null) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Importation réussie',
+            text: 'Les données ont été importées avec succès !',
+            confirmButtonText: 'OK'
+        });
+    }
+</script>
+
+
+
 <!-- All Jquery -->
 <!-- ============================================================== -->
 <script th:inline="javascript">
