@@ -1,6 +1,8 @@
 package site.easy.to.build.crm.controller;
 
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -15,7 +17,9 @@ import site.easy.to.build.crm.entity.*;
 import site.easy.to.build.crm.entity.settings.TicketEmailSettings;
 import site.easy.to.build.crm.google.service.acess.GoogleAccessService;
 import site.easy.to.build.crm.google.service.gmail.GoogleGmailApiService;
+import site.easy.to.build.crm.service.budget.BudgetService;
 import site.easy.to.build.crm.service.customer.CustomerService;
+import site.easy.to.build.crm.service.depense.DepenseService;
 import site.easy.to.build.crm.service.settings.TicketEmailSettingsService;
 import site.easy.to.build.crm.service.ticket.TicketService;
 import site.easy.to.build.crm.service.user.UserService;
@@ -25,6 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -40,12 +45,16 @@ public class TicketController {
     private final CustomerService customerService;
     private final TicketEmailSettingsService ticketEmailSettingsService;
     private final GoogleGmailApiService googleGmailApiService;
+    private final DepenseService depenseService;
     private final EntityManager entityManager;
+    
+    @Autowired
+    private BudgetService budgetService;
 
 
     @Autowired
     public TicketController(TicketService ticketService, AuthenticationUtils authenticationUtils, UserService userService, CustomerService customerService,
-                            TicketEmailSettingsService ticketEmailSettingsService, GoogleGmailApiService googleGmailApiService, EntityManager entityManager) {
+                            TicketEmailSettingsService ticketEmailSettingsService, GoogleGmailApiService googleGmailApiService, EntityManager entityManager  , DepenseService depenseService ) {
         this.ticketService = ticketService;
         this.authenticationUtils = authenticationUtils;
         this.userService = userService;
@@ -53,6 +62,7 @@ public class TicketController {
         this.ticketEmailSettingsService = ticketEmailSettingsService;
         this.googleGmailApiService = googleGmailApiService;
         this.entityManager = entityManager;
+        this.depenseService = depenseService;
     }
 
     @GetMapping("/show-ticket/{id}")
@@ -98,6 +108,7 @@ public class TicketController {
         model.addAttribute("tickets",tickets);
         return "ticket/my-tickets";
     }
+    
     @GetMapping("/create-ticket")
     public String showTicketCreationForm(Model model, Authentication authentication) {
         int userId = authenticationUtils.getLoggedInUserId(authentication);
@@ -122,10 +133,25 @@ public class TicketController {
         return "ticket/create-ticket";
     }
 
+    @PostMapping("/select-depense")
+    public String selectDepense(@ModelAttribute("ticket") Ticket ticket,
+                               @RequestParam("customerId") int customerId,
+                               @RequestParam("employeeId") int employeeId,
+                               Model model) {
+        
+        //List<Budget> budgets = budgetService.findByCustomer(customerId);
+        
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("customerId", customerId);
+        model.addAttribute("employeeId", employeeId);
+        
+        return "ticket/select-depense";
+    }
+
     @PostMapping("/create-ticket")
     public String createTicket(@ModelAttribute("ticket") @Validated Ticket ticket, BindingResult bindingResult, @RequestParam("customerId") int customerId,
                                @RequestParam Map<String, String> formParams, Model model,
-                               @RequestParam("employeeId") int employeeId, Authentication authentication) {
+                               @RequestParam("employeeId") int employeeId , @RequestParam("montant") double montant ,Authentication authentication , HttpSession session) {
 
         int userId = authenticationUtils.getLoggedInUserId(authentication);
         User manager = userService.findById(userId);
@@ -135,6 +161,7 @@ public class TicketController {
         if(manager.isInactiveUser()) {
             return "error/account-inactive";
         }
+
         if(bindingResult.hasErrors()) {
             List<User> employees = new ArrayList<>();
             List<Customer> customers;
@@ -164,13 +191,48 @@ public class TicketController {
             }
         }
 
-        ticket.setCustomer(customer);
-        ticket.setManager(manager);
-        ticket.setEmployee(employee);
-        ticket.setCreatedAt(LocalDateTime.now());
+        try {
+            int value = depenseService.checkDepassementBudget(model, customer, montant);
+            
+            Depense depense = new Depense();
+            depense.setMontant(montant);
+            depense.setDateUpdate(LocalDate.now());
+            ticket.setCustomer(customer);
+            ticket.setManager(manager);
+            ticket.setEmployee(employee);
+            ticket.setDepense(depense);
+            ticket.setCreatedAt(LocalDateTime.now());
 
+            if (value==1) { /* Nihotra */
+                List<Budget> budgets = budgetService.findByCustomer(customerId);        
+                model.addAttribute("ticket", ticket);
+                model.addAttribute("customerId", customerId);
+                model.addAttribute("employeeId", employeeId);
+                model.addAttribute("budgets", budgets);
+                model.addAttribute("montant", montant );
+                session.setAttribute("tempTicket",ticket);
+                return "ticket/select-depense";
+
+            }
+            if (value==0) { /* Tsy nihotra mintsy */   
+                
+                ticketService.save(ticket);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            throw new RuntimeException(e);
+        }
+        
+        
+
+        return "redirect:/employee/ticket/assigned-tickets";
+    }
+
+    @GetMapping("/confirm-ticket")
+    public String confirmTicket(HttpSession session){
+        Ticket ticket = (Ticket) session.getAttribute("tempTicket");
         ticketService.save(ticket);
-
+        session.removeAttribute("tempTicket");
         return "redirect:/employee/ticket/assigned-tickets";
     }
 
@@ -225,6 +287,7 @@ public class TicketController {
         if(loggedInUser.isInactiveUser()) {
             return "error/account-inactive";
         }
+
 
         Ticket previousTicket = ticketService.findByTicketId(ticket.getTicketId());
         if(previousTicket == null) {

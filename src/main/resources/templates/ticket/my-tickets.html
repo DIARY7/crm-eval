@@ -83,6 +83,7 @@
                                         <th>Subject</th>
                                         <th>priority</th>
                                         <th>Status</th>
+                                        <th> Depense</th>
                                         <th>Customer</th>
                                         <th>Assigned Employee</th>
                                         <th>Show Full Details</th>
@@ -96,6 +97,7 @@
                                         <td th:text="${ticket.subject}"></td>
                                         <td th:text="${ticket.priority}"></td>
                                         <td th:text="${ticket.status}"></td>
+                                        <td th:text="${ticket.depense != null ? ticket.depense.montant : 'Aucune'}"></td>
                                         <td th:text="${ticket.customer.name}"></td>
                                         <td th:text="${ticket.employee.username}"></td>
                                         <td><a th:href="${home + 'employee/ticket/show-ticket/' + ticket.ticketId}"><i class="fas fa-eye"></i></a></td>

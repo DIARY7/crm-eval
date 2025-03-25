@@ -1,0 +1,34 @@
+@keyframes alarm-blink {
+    0% { color: red !important ; opacity: 1; }
+    50% { color: darkred !important; opacity: 0.5; }
+    100% { color: red !important; opacity: 1; }
+}
+
+.blinking-alarm {
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    background-color: red;
+    color: white !important;
+    animation: alarm-blink 1s infinite alternate;
+    border: none;
+    cursor: pointer;
+}
+
+.blinking-import {
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    background-color: rgb(38, 255, 0);
+    color: white !important;
+    border: none;
+    cursor: pointer;
+}

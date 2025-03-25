@@ -14,6 +14,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import site.easy.to.build.crm.config.oauth2.CustomOAuth2UserService;
 import site.easy.to.build.crm.config.oauth2.OAuthLoginSuccessHandler;
 import site.easy.to.build.crm.service.user.OAuthUserService;
@@ -23,8 +26,7 @@ import java.util.Optional;
 
 
 @Configuration
-public class SecurityConfig {
-
+public class SecurityConfig implements WebMvcConfigurer {
 
     private final OAuthLoginSuccessHandler oAuth2LoginSuccessHandler;
 
@@ -46,6 +48,16 @@ public class SecurityConfig {
         this.environment = environment;
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/rest/**")  // Appliquer à toutes les API sous /rest
+                .allowedOrigins("http://localhost:5244")  // L'origine de ton application .NET
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")  // Méthodes autorisées
+                .allowedHeaders("Content-Type", "Authorization")  // En-têtes autorisés
+                .allowCredentials(true);  // Autoriser les cookies et informations sensibles 
+    }
+
+
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -59,7 +71,8 @@ public class SecurityConfig {
 
         http.
                 authorizeHttpRequests((authorize) -> authorize
-
+                        .requestMatchers("/login/connection").permitAll() 
+                        .requestMatchers("/rest/**").permitAll()
                         .requestMatchers("/register/**").permitAll()
                         .requestMatchers("/set-employee-password/**").permitAll()
                         .requestMatchers("/change-password/**").permitAll()
