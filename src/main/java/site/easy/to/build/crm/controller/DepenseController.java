@@ -57,39 +57,39 @@ public class DepenseController {
         return "depense/my-depenses";
     }
 
-    @PostMapping("/create-depense")
-    public String toFormDepense(Model model,Authentication authentication,
-     @ModelAttribute("depense") @Validated Depense depense,BindingResult bindingResult , @RequestParam("id_budget") int idBudget  
-    ){
-        int userId = authenticationUtils.getLoggedInUserId(authentication);
-        User user = userService.findById(userId);
-        if(user.isInactiveUser()) {
-            return "error/account-inactive";
-        }
+    // @PostMapping("/create-depense")
+    // public String toFormDepense(Model model,Authentication authentication,
+    //  @ModelAttribute("depense") @Validated Depense depense,BindingResult bindingResult , @RequestParam("id_budget") int idBudget  
+    // ){
+    //     int userId = authenticationUtils.getLoggedInUserId(authentication);
+    //     User user = userService.findById(userId);
+    //     if(user.isInactiveUser()) {
+    //         return "error/account-inactive";
+    //     }
 
-        if(bindingResult.hasErrors()) {
-            model.addAttribute("budgets", budgetService.findAllBudget());
-            return "depense/create-depense";
-        }
+    //     if(bindingResult.hasErrors()) {
+    //         model.addAttribute("budgets", budgetService.findAllBudget());
+    //         return "depense/create-depense";
+    //     }
         
-        try {
-            Budget budget = budgetService.findById(idBudget);
-            int value = depenseService.checkDepassementBudget(model, budget, depense.getMontant());
-            depense.setBudget(budget);
-            depense.setDateUpdate(LocalDate.now());
-            if (value==1) { /* Nihotra */
-                model.addAttribute("budgets", budgetService.findAllBudget());
-                return "depense/create-depense";
-            }
-            if (value==0) { /* Tsy nihotra mintsy */   
-                depenseService.saveDepense(depense);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            throw new RuntimeException(e);
-        }
-        return "redirect:/depense/all-depenses";
-    }
+    //     try {
+    //         Budget budget = budgetService.findById(idBudget);
+    //         int value = depenseService.checkDepassementBudget(model, budget, depense.getMontant());
+    //         depense.setBudget(budget);
+    //         depense.setDateUpdate(LocalDate.now());
+    //         if (value==1) { /* Nihotra */
+    //             model.addAttribute("budgets", budgetService.findAllBudget());
+    //             return "depense/create-depense";
+    //         }
+    //         if (value==0) { /* Tsy nihotra mintsy */   
+    //             depenseService.saveDepense(depense);
+    //         }
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //         throw new RuntimeException(e);
+    //     }
+    //     return "redirect:/depense/all-depenses";
+    // }
 
     @PostMapping("/confirm-depense")
     public String confirmDepense(Model model,@ModelAttribute("depense") Depense depense , @RequestParam("id_budget") int idBudget ){

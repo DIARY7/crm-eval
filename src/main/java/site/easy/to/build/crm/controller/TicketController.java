@@ -139,12 +139,11 @@ public class TicketController {
                                @RequestParam("employeeId") int employeeId,
                                Model model) {
         
-        List<Budget> budgets = budgetService.findByCustomer(customerId);
+        //List<Budget> budgets = budgetService.findByCustomer(customerId);
         
         model.addAttribute("ticket", ticket);
         model.addAttribute("customerId", customerId);
         model.addAttribute("employeeId", employeeId);
-        model.addAttribute("budgets", budgets);
         
         return "ticket/select-depense";
     }
@@ -152,7 +151,7 @@ public class TicketController {
     @PostMapping("/create-ticket")
     public String createTicket(@ModelAttribute("ticket") @Validated Ticket ticket, BindingResult bindingResult, @RequestParam("customerId") int customerId,
                                @RequestParam Map<String, String> formParams, Model model,
-                               @RequestParam("employeeId") int employeeId , @RequestParam("budgetId") int budgetId , @RequestParam("montant") double montant ,Authentication authentication , HttpSession session) {
+                               @RequestParam("employeeId") int employeeId , @RequestParam("montant") double montant ,Authentication authentication , HttpSession session) {
 
         int userId = authenticationUtils.getLoggedInUserId(authentication);
         User manager = userService.findById(userId);
@@ -193,12 +192,10 @@ public class TicketController {
         }
 
         try {
-            Budget budget = budgetService.findById(budgetId);
-            int value = depenseService.checkDepassementBudget(model, budget, montant);
+            int value = depenseService.checkDepassementBudget(model, customer, montant);
             
             Depense depense = new Depense();
             depense.setMontant(montant);
-            depense.setBudget(budget);
             depense.setDateUpdate(LocalDate.now());
             ticket.setCustomer(customer);
             ticket.setManager(manager);
@@ -213,7 +210,6 @@ public class TicketController {
                 model.addAttribute("employeeId", employeeId);
                 model.addAttribute("budgets", budgets);
                 model.addAttribute("montant", montant );
-                model.addAttribute("budgetSelect", budgetId);
                 session.setAttribute("tempTicket",ticket);
                 return "ticket/select-depense";
 

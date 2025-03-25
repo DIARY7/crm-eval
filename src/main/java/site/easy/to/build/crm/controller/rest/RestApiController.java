@@ -22,6 +22,7 @@ import site.easy.to.build.crm.dto.BudgetDto;
 import site.easy.to.build.crm.dto.LeadDto;
 import site.easy.to.build.crm.dto.TicketDto;
 import site.easy.to.build.crm.entity.Budget;
+import site.easy.to.build.crm.entity.Customer;
 import site.easy.to.build.crm.entity.Lead;
 import site.easy.to.build.crm.entity.Ticket;
 import site.easy.to.build.crm.entity.settings.Parametrage;
@@ -29,6 +30,7 @@ import site.easy.to.build.crm.repository.BudgetRepo;
 import site.easy.to.build.crm.repository.DepenseRepo;
 import site.easy.to.build.crm.repository.settings.ParametrageRepo;
 import site.easy.to.build.crm.service.budget.BudgetService;
+import site.easy.to.build.crm.service.customer.CustomerService;
 import site.easy.to.build.crm.service.depense.DepenseService;
 import site.easy.to.build.crm.service.lead.LeadService;
 import site.easy.to.build.crm.service.ticket.TicketService;
@@ -56,15 +58,18 @@ public class RestApiController {
     @Autowired
     BudgetService budgetService;
 
+    @Autowired
+    CustomerService customerService;
+
     @GetMapping("/budgets/{idCustomer}")
     public List<Budget> getBudgetCustomer(@PathVariable(name="idCustomer") int idCustomer ){
         return budgetService.findByCustomer(idCustomer);
     }
 
     @GetMapping("/check_budget")
-    public int checkDepassement(@RequestParam(name = "id_budget") int idBudget , @RequestParam(name = "montant") double montant ) throws Exception{
-        Budget budget = budgetService.findById(idBudget);
-        int response = depenseService.checkDepassementBudgetApi(budget, montant);
+    public int checkDepassement(@RequestParam(name = "id_customer") int idCustomer , @RequestParam(name = "montant") double montant ) throws Exception{
+        Customer customer = customerService.findByCustomerId(idCustomer);
+        int response = depenseService.checkDepassementBudgetApi(customer, montant);
         return response;
     }
     

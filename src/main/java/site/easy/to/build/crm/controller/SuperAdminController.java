@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import site.easy.exception.MyCsvException;
 import site.easy.to.build.crm.service.database.DatabaseService;
+import site.easy.to.build.crm.service.database.GenerationService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -27,6 +28,8 @@ public class SuperAdminController {
     @Autowired
     DatabaseService dataService;
 
+    @Autowired
+    GenerationService generationService;
 
     @GetMapping("reset")
     public String resetBase(){
@@ -63,6 +66,18 @@ public class SuperAdminController {
         }
         model.addAttribute("success", 1);
         return "database/import-data";
+    }
+
+    @GetMapping("generer-data")
+    public String genererData(){
+        try {
+            generationService.generateAndSaveRandomData(4, 3  , 2, 2);
+        } catch (Exception e) {
+            // TODO: handle exception
+            throw new RuntimeException(e);
+        }
+        return "database/generer-ok";    
+        
     }
 
 }

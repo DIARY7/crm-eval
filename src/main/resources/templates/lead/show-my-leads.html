@@ -86,7 +86,7 @@
                                         <th>Customer</th>
                                         <th>Depense</th>
                                         <th>Assigned Employee</th>
-                                        <th>Assign depense</th>
+                                        <!-- <th>Assign depense</th> -->
                                         <th>Show</th>
                                         <th>Edit</th>
                                         <th>Delete</th>
@@ -101,7 +101,7 @@
                                         <td th:text="${lead.customer.name}"></td>
                                         <td th:text="${lead.depense != null ? lead.depense.montant : 'Aucune'}"></td>
                                         <td th:text="${lead.employee.username}"></td>
-                                        <td><a th:href="${home + 'employee/lead/add_depense/' + lead.leadId}"><i class="fas fa-money-bill-wave"></i></a></td>
+                                        <!-- <td><a th:href="${home + 'employee/lead/add_depense/' + lead.leadId}"><i class="fas fa-money-bill-wave"></i></a></td> -->
                                         <td><a th:href="${home + 'employee/lead/show/' + lead.leadId}"><i class="fas fa-eye"></i></a></td>
                                         <td><a th:href="${home + 'employee/lead/update/' + lead.leadId}"><i class="fas fa-edit"></i></a></td>
                                         <td>

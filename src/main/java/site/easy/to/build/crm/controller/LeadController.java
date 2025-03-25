@@ -204,7 +204,7 @@ public class LeadController {
     public String createLead(@ModelAttribute("lead") @Validated Lead lead, BindingResult bindingResult,
                              @RequestParam("customerId") int customerId, @RequestParam("employeeId") int employeeId,
                              Authentication authentication, @RequestParam("allFiles")@Nullable String files, 
-                             @RequestParam("folderId") @Nullable String folderId,@RequestParam("montant") double montant , @RequestParam("budgetId") int budgetId , Model model) throws JsonProcessingException,Exception {
+                             @RequestParam("folderId") @Nullable String folderId,@RequestParam("montant") double montant , Model model) throws JsonProcessingException,Exception {
 
         int userId = authenticationUtils.getLoggedInUserId(authentication);
         User manager = userService.findById(userId);
@@ -224,11 +224,8 @@ public class LeadController {
             return "error/500";
         }
         
-        Budget budget = budgetService.findById(budgetId);
-        
         Depense depense = new Depense();
         depense.setMontant(montant);
-        depense.setBudget(budget);
         depense.setDateUpdate(LocalDate.now());
 
         lead.setCustomer(customer);

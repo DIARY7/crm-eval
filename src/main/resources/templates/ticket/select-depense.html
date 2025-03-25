@@ -83,20 +83,14 @@
                                 <input type="hidden" name="status" th:value="${ticket.status}">
                                 <input type="hidden" name="priority" th:value="${ticket.priority}">
                                 <input type="hidden" name="employeeId" th:value="${employeeId}">
-                                <input type="hidden" name="customerId" th:value="${customerId}">
+                                <input type="hidden" name="customerId" id="id_customer" th:value="${customerId}">
                                 
                                 <label class="m-t-20" for="montant">Montant:</label>
                                 <div class="input-group">
                                     <input type="text" name="montant" id="montant" class="form-control" th:value="${montant != null ? montant : ''}"  >
                                 </div>
 
-                                <label class="m-t-20" for="budgetId">Budget : </label>
-                                <div class="input-group">
-                                    <select name="budgetId" id="budgetId" class="form-control" required>
-                                        <option value=""> Selectionner un budget </option>
-                                        <option th:each="budget : ${budgets}" th:text="${'N°' + budget.id}" th:value="${budget.id}" th:selected="${budgetSelect != null and budget.id == budgetSelect}"></option>
-                                    </select>
-                                </div>
+                                
 
                                 <!-- Spinner de chargement (initialement caché) -->
                                 <div id="loadingSpinner" style="display:none; text-align:center;">
@@ -150,10 +144,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function checkTaux() {
-        var idBudget = document.getElementById('budgetId').value;
+        var idCustomer = document.getElementById('id_customer').value;
         var montantPlus = document.getElementById('montant').value;
 
-        if (!idBudget) {
+        if (!idCustomer) {
             document.getElementById('submitButton').disabled = true;
             return;
         }
@@ -162,8 +156,8 @@
         document.getElementById('submitButton').disabled = true;
         document.getElementById('alertMessage').style.display = 'none';
 
-        if (idBudget && montantPlus) {
-            fetch(`/depense/rest/check_taux?id_budget=${idBudget}&montantPlus=${montantPlus}`)
+        if (idCustomer && montantPlus) {
+            fetch(`/depense/rest/check_taux?id_customer=${idCustomer}&montantPlus=${montantPlus}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('loadingSpinner').style.display = 'none';
@@ -186,7 +180,6 @@
     }
 
 // Ajouter l'événement sur les deux champs
-document.getElementById('budgetId').addEventListener('change', checkTaux);
 document.getElementById('montant').addEventListener('change', checkTaux);
 
 

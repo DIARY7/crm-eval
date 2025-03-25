@@ -298,6 +298,7 @@ public class DatabaseService {
                     .withIgnoreLeadingWhiteSpace(true)
                     .withIgnoreEmptyLine(true) // Ignore les lignes vides
                     .withSeparator(';') // Spécifie le bon séparateur
+                    .withThrowExceptions(false)
                     .build();
             int lineNumber = 1; // Compteur de ligne
             for (BudgetCsv ticket : csvToBean) {

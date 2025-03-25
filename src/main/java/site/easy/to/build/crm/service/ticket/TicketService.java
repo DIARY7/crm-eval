@@ -39,4 +39,5 @@ public interface TicketService {
     List<Map<String, Double>> getTotalDepenseByPriority(); 
 
     void deleteTicket(int id_ticket);
+
 }
