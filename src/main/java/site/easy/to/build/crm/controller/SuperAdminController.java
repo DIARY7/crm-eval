@@ -35,18 +35,8 @@ public class SuperAdminController {
     }
 
     @GetMapping("import")
-<<<<<<< HEAD
     public String toFormImport(){
         return "database/import-data";
-=======
-    public String toImportBase(@RequestParam("file") MultipartFile file){
-        try {
-            dataService.importerCsv(file);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return "redirect:/";
->>>>>>> 526086c40acecb3f66d0da33d989845967ccd828
     }
 
     @PostMapping("importer")
@@ -61,9 +51,5 @@ public class SuperAdminController {
         }
         return "redirect:/";
     }
-//    @PostMapping("importer")
-//    public String importCsvFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-//
-//        return "redirect:/import";
-//    }
+
 }

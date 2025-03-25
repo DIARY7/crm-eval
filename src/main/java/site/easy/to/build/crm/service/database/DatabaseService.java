@@ -87,10 +87,7 @@ public class DatabaseService {
             }
 
         } catch (Exception e) {
-<<<<<<< HEAD
             e.printStackTrace();
-=======
->>>>>>> 526086c40acecb3f66d0da33d989845967ccd828
             throw new RuntimeException("Erreur lors de l'importation du fichier CSV : " + e.getMessage());
         }
     }
